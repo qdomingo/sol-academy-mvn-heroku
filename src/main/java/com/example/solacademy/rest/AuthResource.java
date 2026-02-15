@@ -39,11 +39,6 @@ public class AuthResource {
         }
         return "Invalid username or password";
     }
- 
-    @PostMapping("/login")
-    public String login() {
-        return "User logged in successfully";
-    }
 
 }
 
