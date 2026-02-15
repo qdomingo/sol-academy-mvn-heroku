@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.solacademy.mapper.ScheduleMapper">
+    <select id="getAllSchedules" resultType="com.example.solacademy.model.Schedule">
+        SELECT * FROM schedule ORDER BY id
+    </select>
+    <select id="getScheduleById" resultType="com.example.solacademy.model.Schedule">
+        SELECT * FROM schedule WHERE id = #{id}
+    </select>
+    <select id="getScheduleByStudentId" resultType="com.example.solacademy.model.Schedule">
+        SELECT * FROM schedule WHERE student_id = #{id}
+        order by inicio
+    </select>
+    <select id="getMaxScheduleID" resultType="long">
+        SELECT nvl(max(to_number(id))+1,1) FROM schedule
+    </select>
+    <insert id="createSchedule">
+        INSERT INTO schedule(id, title, inicio, fin, student_id, weekly, serie_id, task_id)
+        VALUES(#{id}, #{title}, #{inicio}, #{fin}, #{student_id}, #{weekly}, #{serie_id,jdbcType=VARCHAR},
+        #{task_id,jdbcType=NUMERIC})    
+    </insert>
+    <update id="updateSchedule">
+        UPDATE schedule
+        SET inicio = #{inicio}, fin = #{fin}, title = #{title}
+        WHERE id = #{id}
+    </update>
+    <update id="updateScheduleSerie">
+        UPDATE schedule
+        SET inicio = #{inicio}, fin = #{fin}, title = #{title}, serie_id = #{serie_id}
+        WHERE id = #{id}
+        AND TO_DATE(substr(#{inicio},0,19), 'YYYY-MM-DD"T"HH24:MI:SS') > sysdate
+    </update>
+    <update id="updateScheduleTask">
+        UPDATE schedule
+        SET task_id = #{task_id,jdbcType=NUMERIC}
+        WHERE id = #{id}
+    </update>
+    <update id="resetScheduleTask">
+        UPDATE schedule
+        SET task_id = null
+        WHERE task_id = #{task_id,jdbcType=NUMERIC}
+    </update>
+    <delete id="deleteSchedule">
+        DELETE FROM schedule WHERE id = #{id}
+    </delete>
+    <delete id="deleteStudentSchedule">
+        DELETE FROM schedule WHERE student_id = #{id}
+    </delete>
+    <delete id="deleteScheduleSerie">
+        DELETE FROM schedule WHERE student_id = #{id} AND weekly = 1
+        AND serie_id like #{serie_id}
+        AND TO_DATE(substr(inicio,0,19), 'YYYY-MM-DD"T"HH24:MI:SS') > sysdate
+    </delete>
+</mapper>
